@@ -44,11 +44,11 @@ public class Tile : MonoBehaviour
 
 public enum TileType
 {
-    Start,
-    Land,
-    Wildcard,
     Brute,
     Thief,
     Warrior,
-    Wizard
+    Wizard,
+    Start,
+    Land,
+    Wildcard
 }

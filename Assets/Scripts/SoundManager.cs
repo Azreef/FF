@@ -20,12 +20,4 @@ public class SoundManager : MonoBehaviour
     {
         instance = this;
     }
-
-    public void PlayLoop(AudioClip clip)
-    {
-        audioSource.loop = true;
-        audioSource.clip = clip;
-        audioSource.Play();
-
-    }
 }

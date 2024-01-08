@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Character : MonoBehaviour
 {
@@ -12,15 +13,16 @@ public class Character : MonoBehaviour
     [SerializeField] private GameObject thief;
     [SerializeField] private GameObject warrior;
     [SerializeField] private GameObject wizard;
-    [SerializeField] private GameObject startTile;
+    [SerializeField] private GameObject tileStart;
 
     private int health;
     private int healthMax;
     private int healthDie;
     private int movementDie;
     private int attackDie;
-    private Tile currentTile;
-    private Tile lastTile;
+    private Tile tileCurrent;
+    private Tile tileLast;
+    private TileType tt;
     
     private void Awake()
     {
@@ -29,12 +31,14 @@ public class Character : MonoBehaviour
 
     private void OnDestroy()
     {
-        
+        GameManager.instance.players.Remove(this);
     }
 
     void Start()
     {
-        currentTile = startTile.GetComponent<Tile>();
+        tileLast = tileCurrent = tileStart.GetComponent<Tile>();
+        tt = tileCurrent.type;
+        
 
         switch(role)
         {
@@ -69,6 +73,44 @@ public class Character : MonoBehaviour
         }
     }
 
+    public void TurnStart()
+    {
+        GameManager.instance.moveButton.interactable = true;
+
+        switch (tt)
+        {
+            case TileType.Brute:
+                if (role == Role.Brute) break;
+                goto default;
+            case TileType.Thief:
+                if (role == Role.Thief) break;
+                goto default;
+            case TileType.Warrior:
+                if (role == Role.Warrior) break;
+                goto default;
+            case TileType.Wizard:
+                if (role == Role.Wizard) break;
+                goto default;
+            case TileType.Start:
+            case TileType.Wildcard:
+            case TileType.Land:
+                break;
+            default:
+                if (health > 5) GameManager.instance.moveButton.interactable = false;
+                GameManager.instance.battleButton.interactable = true;
+                GameManager.instance.conquerButton.interactable = true;
+                break;
+        }
+        GameManager.instance.moveButton.onClick.AddListener(Move);
+        GameManager.instance.battleButton.onClick.AddListener(Battle);
+        GameManager.instance.conquerButton.onClick.AddListener(Conquer);
+    }
+
+    public void TurnEnd()
+    {
+        GameManager.instance.Decide();
+    }
+
     public void Heal(int amount)
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.pawnHealSound);
@@ -84,6 +126,13 @@ public class Character : MonoBehaviour
     public void Move()
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.inGameButtonSound);
+        GameManager.instance.moveButton.interactable = false;
+
+        StartCoroutine(MoveCoroutine());
+    }
+
+    protected IEnumerator MoveCoroutine()
+    {
 
         int movementRoll = Roll(movementDie);
 
@@ -95,18 +144,22 @@ public class Character : MonoBehaviour
 
             do
             {
-                nt = UnityEngine.Random.Range(0, currentTile.nextTiles.Count);
-            } while (lastTile == currentTile.nextTiles[nt]);
+                nt = UnityEngine.Random.Range(0, tileCurrent.nextTiles.Count);
+            } while (tileLast == tileCurrent.nextTiles[nt]);
 
-            if (Vector3.Distance(transform.position, currentTile.nextTiles[nt].transform.position + new Vector3(0, 4, 0)) > 5)
+            if (Vector3.Distance(transform.position, tileCurrent.nextTiles[nt].transform.position + new Vector3(0, 1, 0)) > 15)
                 SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.portalSound);
 
-            transform.position = currentTile.nextTiles[nt].transform.position + new Vector3(0, 1, 0);
-            lastTile = currentTile;
-            currentTile = currentTile.nextTiles[nt];
+            transform.position = tileCurrent.nextTiles[nt].transform.position + new Vector3(0, 1, 0);
+            tileLast = tileCurrent;
+            tileCurrent = tileCurrent.nextTiles[nt];
 
-            if (currentTile.type == TileType.Start) Heal(2);
+            if (tileCurrent.type == TileType.Start) Heal(2);
+
+            yield return new WaitForSeconds(.5f);
         }
+
+        TurnEnd();
     }
 
     public void Battle()
