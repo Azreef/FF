@@ -185,7 +185,7 @@ public class Character : MonoBehaviour
 
         if (attackerHealthRoll > defenderTotal)
         {
-            tileCurrent.SetOwner(this);
+            Damage(tileCurrent.owner.attackDie);
             Debug.Log($"{role} won!");
         }
         else
@@ -219,19 +219,24 @@ public class Character : MonoBehaviour
 
             int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
             int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
-            int defenderAttackRoll = Roll(tileCurrent.owner.attackDie);
-            int defenderTotal = defenderHealthRoll + defenderMovementRoll + defenderAttackRoll;
+            int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
             Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
             Debug.Log($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
-            Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll} | Attack Roll: {defenderAttackRoll}");
+            Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
             if (attackerTotal > defenderTotal)
             {
+                Damage(tileCurrent.owner.attackDie);
                 Debug.Log($"{role} won {i}/3!"); win++;
             }
             else
+            {
                 Debug.Log($"{tileCurrent.owner} won {i}/3!");
+            }
+
+            Damage(tileCurrent.owner.attackDie);
+            tileCurrent.owner.Damage(attackDie);
 
             yield return new WaitForSeconds(.25f);
         }
