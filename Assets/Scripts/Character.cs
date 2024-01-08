@@ -41,16 +41,16 @@ public class Character : MonoBehaviour
         switch(role)
         {
             case Role.Brute:
-                health = healthMax = 20;
-                healthDie = 8;
-                movementDie = 8;
+                health = healthMax = 28;
+                healthDie = 12;
+                movementDie = 4;
                 attackDie = 1;
                 Instantiate(brute, this.transform);
                 break;
             case Role.Thief:
-                health = healthMax = 20;
-                healthDie = 8;
-                movementDie = 8;
+                health = healthMax = 16;
+                healthDie = 6;
+                movementDie = 12;
                 attackDie = 1;
                 Instantiate(thief, this.transform);
                 break;
@@ -62,10 +62,10 @@ public class Character : MonoBehaviour
                 Instantiate(warrior, this.transform);
                 break;
             case Role.Wizard:
-                health = healthMax = 20;
-                healthDie = 8;
+                health = healthMax = 16;
+                healthDie = 6;
                 movementDie = 8;
-                attackDie = 1;
+                attackDie = 2;
                 Instantiate(wizard, this.transform);
                 break;
         }
