@@ -7,15 +7,14 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Object sceneDefault;
 
     void Start()
     {
-        SceneManager.LoadScene(sceneDefault.name, LoadSceneMode.Additive);
+
     }
 
     void Update()
     {
-        
+
     }
 }
