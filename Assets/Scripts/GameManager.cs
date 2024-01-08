@@ -31,22 +31,30 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         clockwise = (random.Next(2) == 0);
-        turn = turnFirst = random.Next(players.Count - 1);
+        turn = turnFirst = 0;//turn = turnFirst = random.Next(players.Count - 1);
 
         players[turn].TurnStart();
     }
 
     public void Decide()
     {
+        if (battleButton.interactable || conquerButton.interactable)
+        {
+            ResetButtons();
+            players[turn].TurnStart();
+            return;
+        }
+
         ResetButtons();
+        RemoveDeadCharacters();
         TurnNext();
     }
 
     public void TurnNext()
     {
-        turn += clockwise ? 1 : -1;
+        turn++;// turn += clockwise ? 1 : -1;
         if (turn >= players.Count) turn = 0;
-        if (turn <= -1) turn = players.Count - 1;
+        //if (turn <= -1) turn = players.Count - 1;
 
         if (turn == turnFirst) round++;
 
@@ -62,5 +70,18 @@ public class GameManager : MonoBehaviour
         moveButton.onClick.RemoveAllListeners();
         battleButton.onClick.RemoveAllListeners();
         conquerButton.onClick.RemoveAllListeners();
+    }
+
+    public void RemoveDeadCharacters()
+    {
+        foreach(Character character in players)
+        {
+            if(character.health == 0)
+            {
+                Destroy(character.gameObject);
+
+                if (turn >= players.Count) turn = 0;
+            }
+        }
     }
 }

@@ -15,14 +15,16 @@ public class Character : MonoBehaviour
     [SerializeField] private GameObject wizard;
     [SerializeField] private GameObject tileStart;
 
-    private int health;
+    private System.Random random = new System.Random();
     private int healthMax;
     private int healthDie;
     private int movementDie;
     private int attackDie;
     private Tile tileCurrent;
     private Tile tileLast;
-    
+
+    public int health;
+
     private void Awake()
     {
 
@@ -30,13 +32,19 @@ public class Character : MonoBehaviour
 
     private void OnDestroy()
     {
+        var tiles = FindObjectsOfType<Tile>();
+
+        foreach (var tile in tiles)
+        {
+            if (tile.owner == this) tile.ResetOwner();
+        }
+
         GameManager.instance.players.Remove(this);
     }
 
     void Start()
     {
         tileLast = tileCurrent = tileStart.GetComponent<Tile>();
-        
 
         switch(role)
         {
@@ -73,27 +81,18 @@ public class Character : MonoBehaviour
 
     public void TurnStart()
     {
-        GameManager.instance.moveButton.interactable = true;
-
-        switch (tileCurrent?.type)
-        {
-            case TileType.Start:
-            case TileType.Wildcard:
-                break;
-            case TileType.Land:
-                if (tileCurrent.owner == this) break;
-                goto default;
-            default:
-                if (tileCurrent == null) break;
-                if (health > 5) GameManager.instance.moveButton.interactable = false;
-                GameManager.instance.battleButton.interactable = true;
-                GameManager.instance.conquerButton.interactable = true;
-                break;
-        }
-
         GameManager.instance.moveButton.onClick.AddListener(Move);
         GameManager.instance.battleButton.onClick.AddListener(Battle);
         GameManager.instance.conquerButton.onClick.AddListener(Conquer);
+
+        GameManager.instance.moveButton.interactable = true;
+
+        if(tileCurrent?.type == TileType.Land && tileCurrent?.owner != this && tileCurrent?.owner != null)
+        {
+            if (health > 5) GameManager.instance.moveButton.interactable = false;
+            GameManager.instance.battleButton.interactable = true;
+            GameManager.instance.conquerButton.interactable = true;
+        }
     }
 
     public void TurnEnd()
@@ -149,13 +148,17 @@ public class Character : MonoBehaviour
             yield return new WaitForSeconds(.1f);
         }
 
-        if (tileCurrent.type == TileType.Land && tileCurrent.owner == null) tileCurrent.SetOwner(this);
-
-        if (tileCurrent.type == TileType.Land && tileCurrent.owner != this)
+        if (tileCurrent.type == TileType.Land)
         {
-            GameManager.instance.battleButton.interactable = true;
-            GameManager.instance.conquerButton.interactable = true;
-            yield break;
+            if (tileCurrent.owner == null)
+            {
+                tileCurrent.SetOwner(this);
+            }
+            else if (tileCurrent.owner != this)
+            {
+                GameManager.instance.battleButton.interactable = true;
+                GameManager.instance.conquerButton.interactable = true;
+            }
         }
 
         TurnEnd();
@@ -246,6 +249,25 @@ public class Character : MonoBehaviour
         if (win >= 2) tileCurrent.SetOwner(this);
 
         TurnEnd();
+    }
+
+    private void Draw()
+    {
+        int selected = random.Next(2);
+
+        Debug.Log("WILDCARD:");
+
+        switch (selected)
+        {
+            case 0:
+                Debug.Log("YOU FOUND A HEALING POTION, HEAL 2 HEALTH POINT");
+                Heal(2);
+                break;
+            case 1:
+                Debug.Log("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
+                Heal(-1);
+                break;
+        }
     }
 
     private int Roll(int face)
