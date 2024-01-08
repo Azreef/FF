@@ -22,7 +22,6 @@ public class Character : MonoBehaviour
     private int attackDie;
     private Tile tileCurrent;
     private Tile tileLast;
-    private TileType tt;
     
     private void Awake()
     {
@@ -37,7 +36,6 @@ public class Character : MonoBehaviour
     void Start()
     {
         tileLast = tileCurrent = tileStart.GetComponent<Tile>();
-        tt = tileCurrent.type;
         
 
         switch(role)
@@ -77,30 +75,22 @@ public class Character : MonoBehaviour
     {
         GameManager.instance.moveButton.interactable = true;
 
-        switch (tt)
+        switch (tileCurrent?.type)
         {
-            case TileType.Brute:
-                if (role == Role.Brute) break;
-                goto default;
-            case TileType.Thief:
-                if (role == Role.Thief) break;
-                goto default;
-            case TileType.Warrior:
-                if (role == Role.Warrior) break;
-                goto default;
-            case TileType.Wizard:
-                if (role == Role.Wizard) break;
-                goto default;
             case TileType.Start:
             case TileType.Wildcard:
-            case TileType.Land:
                 break;
+            case TileType.Land:
+                if (tileCurrent.owner == this) break;
+                goto default;
             default:
+                if (tileCurrent == null) break;
                 if (health > 5) GameManager.instance.moveButton.interactable = false;
                 GameManager.instance.battleButton.interactable = true;
                 GameManager.instance.conquerButton.interactable = true;
                 break;
         }
+
         GameManager.instance.moveButton.onClick.AddListener(Move);
         GameManager.instance.battleButton.onClick.AddListener(Battle);
         GameManager.instance.conquerButton.onClick.AddListener(Conquer);
@@ -147,7 +137,7 @@ public class Character : MonoBehaviour
                 nt = UnityEngine.Random.Range(0, tileCurrent.nextTiles.Count);
             } while (tileLast == tileCurrent.nextTiles[nt]);
 
-            if (Vector3.Distance(transform.position, tileCurrent.nextTiles[nt].transform.position + new Vector3(0, 1, 0)) > 15)
+            if (Vector3.Distance(transform.position, tileCurrent.nextTiles[nt].transform.position + new Vector3(0, 1, 0)) > 10)
                 SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.portalSound);
 
             transform.position = tileCurrent.nextTiles[nt].transform.position + new Vector3(0, 1, 0);
@@ -156,7 +146,16 @@ public class Character : MonoBehaviour
 
             if (tileCurrent.type == TileType.Start) Heal(2);
 
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(.1f);
+        }
+
+        if (tileCurrent.type == TileType.Land && tileCurrent.owner == null) tileCurrent.SetOwner(this);
+
+        if (tileCurrent.type == TileType.Land && tileCurrent.owner != this)
+        {
+            GameManager.instance.battleButton.interactable = true;
+            GameManager.instance.conquerButton.interactable = true;
+            yield break;
         }
 
         TurnEnd();
@@ -165,13 +164,83 @@ public class Character : MonoBehaviour
     public void Battle()
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.inGameButtonSound);
+        GameManager.instance.battleButton.interactable = false;
+        GameManager.instance.conquerButton.interactable = false;
 
+        StartCoroutine(BattleCoroutine());
+    }
+
+    protected IEnumerator BattleCoroutine()
+    {
+        int attackerHealthRoll = Roll(healthDie);
+
+        int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
+        int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
+        int defenderAttackRoll = Roll(tileCurrent.owner.attackDie);
+        int defenderTotal = defenderHealthRoll + defenderMovementRoll + defenderAttackRoll;
+
+        Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
+        Debug.Log($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
+        Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll} | Attack Roll: {defenderAttackRoll}");
+
+        if (attackerHealthRoll > defenderTotal)
+        {
+            tileCurrent.SetOwner(this);
+            Debug.Log($"{role} won!");
+        }
+        else
+        {
+            Debug.Log($"{tileCurrent.owner} won!");
+        }
+
+        yield return new WaitForSeconds(.25f);
+
+        TurnEnd();
     }
 
     public void Conquer()
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.inGameButtonSound);
+        GameManager.instance.conquerButton.interactable = false;
+        GameManager.instance.battleButton.interactable = false;
 
+        StartCoroutine(ConquerCoroutine());
+    }
+
+    protected IEnumerator ConquerCoroutine()
+    {
+        int win = 0;
+
+        for (int i = 1; i < 4; i++)
+        {
+            int attackerHealthRoll = Roll(healthDie);
+            int attackerMovementRoll = Roll(movementDie);
+            int attackerTotal = attackerHealthRoll + attackerMovementRoll;
+
+            int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
+            int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
+            int defenderAttackRoll = Roll(tileCurrent.owner.attackDie);
+            int defenderTotal = defenderHealthRoll + defenderMovementRoll + defenderAttackRoll;
+
+            Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
+            Debug.Log($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
+            Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll} | Attack Roll: {defenderAttackRoll}");
+
+            if (attackerTotal > defenderTotal)
+            {
+                Debug.Log($"{role} won {i}/3!"); win++;
+            }
+            else
+                Debug.Log($"{tileCurrent.owner} won {i}/3!");
+
+            yield return new WaitForSeconds(.25f);
+        }
+
+        Debug.Log($"{role} won {win} times!");
+
+        if (win >= 2) tileCurrent.SetOwner(this);
+
+        TurnEnd();
     }
 
     private int Roll(int face)

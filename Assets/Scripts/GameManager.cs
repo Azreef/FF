@@ -6,18 +6,21 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEngine.ParticleSystem;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    //private System.Random random = new System.Random();
+    private System.Random random = new System.Random();
 
     public List<Character> players;
     public Button moveButton;
     public Button battleButton;
     public Button conquerButton;
 
+    private bool clockwise = true;
     private int turn = 0;
+    private int turnFirst;
     private int round = 0;
 
     private void Awake()
@@ -27,8 +30,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        //int turn = random.Next(players.Count - 1);
-        players[0].TurnStart();
+        clockwise = (random.Next(2) == 0);
+        turn = turnFirst = random.Next(players.Count - 1);
+
+        players[turn].TurnStart();
     }
 
     public void Decide()
@@ -39,9 +44,11 @@ public class GameManager : MonoBehaviour
 
     public void TurnNext()
     {
-        turn++; //turn += clockwise ? 1 : -1;
+        turn += clockwise ? 1 : -1;
         if (turn >= players.Count) turn = 0;
-        //if (turn <= -1) turn = players.Count - 1;
+        if (turn <= -1) turn = players.Count - 1;
+
+        if (turn == turnFirst) round++;
 
         players[turn].TurnStart();
     }
