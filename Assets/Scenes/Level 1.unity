@@ -2973,6 +2973,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1194773983}
     m_Modifications:
+    - target: {fileID: 877685144265785054, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16a74396a91c8064e88f38111782da15, type: 2}
     - target: {fileID: 1966269740497053395, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
       propertyPath: m_Name
       value: Tile (2)
@@ -15005,6 +15009,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1194773983}
     m_Modifications:
+    - target: {fileID: 877685144265785054, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16a74396a91c8064e88f38111782da15, type: 2}
     - target: {fileID: 1966269740497053395, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
       propertyPath: m_Name
       value: Tile (4)
@@ -17395,6 +17403,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1194773983}
     m_Modifications:
+    - target: {fileID: 877685144265785054, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16a74396a91c8064e88f38111782da15, type: 2}
     - target: {fileID: 1966269740497053395, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
       propertyPath: m_Name
       value: Tile (8)
@@ -22307,6 +22319,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1194773983}
     m_Modifications:
+    - target: {fileID: 877685144265785054, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 16a74396a91c8064e88f38111782da15, type: 2}
     - target: {fileID: 1966269740497053395, guid: 0902e4ee7cedd1543888fdda3c1e72b4, type: 3}
       propertyPath: m_Name
       value: Tile (6)
