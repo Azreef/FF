@@ -74,7 +74,7 @@ public class Character : MonoBehaviour
 
     public void TurnStart()
     {
-        if (teleport == true)
+        if (teleport == true && !drawn)
             return;
 
         if (tileCurrent?.type == TileType.Wildcard && !drawn)
@@ -275,7 +275,7 @@ public class Character : MonoBehaviour
 
     private void Draw()
     {
-        int selected = random.Next(16);
+        int selected = 6;// random.Next(16);
 
         Debug.Log("WILDCARD:");
 
