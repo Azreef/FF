@@ -2542,6 +2542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92d0c5f1a310a0543b7b9328fa259c56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneNext: {fileID: 102900000, guid: 5c36750f546bfb4408f49bf6885a3e38, type: 3}
   players:
   - {fileID: 692104683}
   - {fileID: 1799602446}
