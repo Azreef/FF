@@ -187,6 +187,11 @@ public class Character : MonoBehaviour
 
     protected IEnumerator BattleCoroutine()
     {
+        if (tileCurrent?.owner == null)
+        {
+            TurnEnd();
+        }
+
         int attackerHealthRoll = Roll(healthDie);
 
         int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
@@ -230,6 +235,11 @@ public class Character : MonoBehaviour
     protected IEnumerator ConquerCoroutine()
     {
         int win = 0;
+
+        if(tileCurrent?.owner == null)
+        {
+            TurnEnd();
+        }
 
         for (int i = 1; i < 4; i++)
         {
@@ -275,7 +285,7 @@ public class Character : MonoBehaviour
 
     private void Draw()
     {
-        int selected = 6;// random.Next(16);
+        int selected = random.Next(16);
 
         Debug.Log("WILDCARD:");
 
