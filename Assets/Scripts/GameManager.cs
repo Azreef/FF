@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     private bool clockwise = true;
     private int turn = 0;
     private int turnFirst;
-    private int round = 0;
+    public int round = 0;
 
     private void Awake()
     {
