@@ -275,7 +275,7 @@ public class Character : MonoBehaviour
 
     private void Draw()
     {
-        int selected = 4;// random.Next(16);
+        int selected = random.Next(16);
 
         Debug.Log("WILDCARD:");
 
