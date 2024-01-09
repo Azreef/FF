@@ -19,7 +19,7 @@ public class Character : MonoBehaviour
     private int healthMax;
     private int healthDie;
     private int movementDie;
-    private int attackDie;
+    private int attack;
     private Tile tileCurrent;
     private Tile tileLast;
 
@@ -52,28 +52,28 @@ public class Character : MonoBehaviour
                 health = healthMax = 28;
                 healthDie = 12;
                 movementDie = 4;
-                attackDie = 1;
+                attack = 1;
                 Instantiate(brute, this.transform);
                 break;
             case Role.Thief:
                 health = healthMax = 16;
                 healthDie = 6;
                 movementDie = 12;
-                attackDie = 1;
+                attack = 1;
                 Instantiate(thief, this.transform);
                 break;
             case Role.Warrior:
                 health = healthMax = 20;
                 healthDie = 8;
                 movementDie = 8;
-                attackDie = 1;
+                attack = 1;
                 Instantiate(warrior, this.transform);
                 break;
             case Role.Wizard:
                 health = healthMax = 16;
                 healthDie = 6;
                 movementDie = 8;
-                attackDie = 2;
+                attack = 2;
                 Instantiate(wizard, this.transform);
                 break;
         }
@@ -167,8 +167,7 @@ public class Character : MonoBehaviour
     public void Battle()
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.inGameButtonSound);
-        GameManager.instance.battleButton.interactable = false;
-        GameManager.instance.conquerButton.interactable = false;
+        GameManager.instance.ResetButtons();
 
         StartCoroutine(BattleCoroutine());
     }
@@ -179,22 +178,24 @@ public class Character : MonoBehaviour
 
         int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
         int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
-        int defenderAttackRoll = Roll(tileCurrent.owner.attackDie);
-        int defenderTotal = defenderHealthRoll + defenderMovementRoll + defenderAttackRoll;
+        int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
         Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
         Debug.Log($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
-        Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll} | Attack Roll: {defenderAttackRoll}");
+        Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
         if (attackerHealthRoll > defenderTotal)
         {
-            Damage(tileCurrent.owner.attackDie);
+            Damage(tileCurrent.owner.attack);
             Debug.Log($"{role} won!");
         }
         else
         {
             Debug.Log($"{tileCurrent.owner} won!");
         }
+
+        Damage(tileCurrent.owner.attack);
+        tileCurrent.owner.Damage(attack);
 
         yield return new WaitForSeconds(.25f);
 
@@ -204,8 +205,7 @@ public class Character : MonoBehaviour
     public void Conquer()
     {
         SoundManager.instance.audioSource.PlayOneShot(SoundManager.instance.inGameButtonSound);
-        GameManager.instance.conquerButton.interactable = false;
-        GameManager.instance.battleButton.interactable = false;
+        GameManager.instance.ResetButtons();
 
         StartCoroutine(ConquerCoroutine());
     }
@@ -230,7 +230,7 @@ public class Character : MonoBehaviour
 
             if (attackerTotal > defenderTotal)
             {
-                Damage(tileCurrent.owner.attackDie);
+                Damage(tileCurrent.owner.attack);
                 Debug.Log($"{role} won {i}/3!"); win++;
             }
             else
@@ -238,8 +238,8 @@ public class Character : MonoBehaviour
                 Debug.Log($"{tileCurrent.owner} won {i}/3!");
             }
 
-            Damage(tileCurrent.owner.attackDie);
-            tileCurrent.owner.Damage(attackDie);
+            Damage(tileCurrent.owner.attack);
+            tileCurrent.owner.Damage(attack);
 
             yield return new WaitForSeconds(.25f);
         }
