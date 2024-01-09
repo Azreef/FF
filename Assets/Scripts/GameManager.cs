@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 using static UnityEngine.ParticleSystem;
 
@@ -41,6 +42,7 @@ public class GameManager : MonoBehaviour
         if (battleButton.interactable || conquerButton.interactable)
         {
             ResetButtons();
+            RemoveDeadCharacters();
             players[turn].TurnStart();
             return;
         }
@@ -74,14 +76,23 @@ public class GameManager : MonoBehaviour
 
     public void RemoveDeadCharacters()
     {
-        foreach(Character character in players)
+        for (int i = players.Count - 1; i >= 0; i--)
         {
-            if(character.health == 0)
+            if (players[i].health == 0)
             {
-                Destroy(character.gameObject);
+                var tiles = FindObjectsOfType<Tile>();
 
-                if (turn >= players.Count) turn = 0;
+                foreach (var tile in tiles)
+                {
+                    if (tile.owner == players[i]) tile.ResetOwner();
+                }
+
+                Destroy(players[i].gameObject);
+
+                players.RemoveAt(i);
             }
         }
+
+        if (turn >= players.Count) turn = 0;
     }
 }

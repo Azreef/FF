@@ -32,14 +32,6 @@ public class Character : MonoBehaviour
 
     private void OnDestroy()
     {
-        var tiles = FindObjectsOfType<Tile>();
-
-        foreach (var tile in tiles)
-        {
-            if (tile.owner == this) tile.ResetOwner();
-        }
-
-        GameManager.instance.players.Remove(this);
     }
 
     void Start()
