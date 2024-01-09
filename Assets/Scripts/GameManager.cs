@@ -11,6 +11,8 @@ using static UnityEngine.ParticleSystem;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private UnityEngine.Object sceneNext;
+
     public static GameManager instance;
     private System.Random random = new System.Random();
 
@@ -95,6 +97,13 @@ public class GameManager : MonoBehaviour
     {
         for (int i = players.Count - 1; i >= 0; i--)
         {
+            if (players.Count == 1)
+            {
+                Debug.Log($"{players[i].gameObject.name} Won!");
+                SceneManager.LoadScene(sceneNext.name);
+                break;
+            }
+
             if (players[i].health == 0)
             {
                 var tiles = FindObjectsOfType<Tile>();
