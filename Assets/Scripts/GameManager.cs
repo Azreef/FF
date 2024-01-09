@@ -97,12 +97,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = players.Count - 1; i >= 0; i--)
         {
-            if (players.Count == 1)
-            {
-                Debug.Log($"{players[i].gameObject.name} Won!");
-                SceneManager.LoadScene(sceneNext.name);
-                break;
-            }
+            VictoryCheck();
 
             if (players[i].health == 0)
             {
@@ -120,5 +115,14 @@ public class GameManager : MonoBehaviour
         }
 
         if (turn >= players.Count) turn = 0;
+    }
+
+    public void VictoryCheck()
+    {
+        if (players.Count == 1)
+        {
+            Debug.Log($"{players[0].gameObject.name} Won!");
+            SceneManager.LoadScene(sceneNext.name);
+        }
     }
 }

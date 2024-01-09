@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
@@ -15,6 +15,8 @@ public class Character : MonoBehaviour
     [SerializeField] private GameObject warrior;
     [SerializeField] private GameObject wizard;
     [SerializeField] private GameObject tileStart;
+    [SerializeField] private Image image;
+    [SerializeField] private Image healthBar;
 
     private System.Random random = new System.Random();
     private int healthMax;
@@ -72,8 +74,16 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+
+        healthBar.fillAmount = ((float)health / (float)healthMax);
+    }
+
     public void TurnStart()
     {
+        image.transform.localScale = new Vector3(1.5f, 1.5f, 1.0f);
+
         if (teleport == true && !drawn)
             return;
 
@@ -102,6 +112,7 @@ public class Character : MonoBehaviour
 
     public void TurnEnd()
     {
+        image.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         GameManager.instance.Decide();
     }
 
