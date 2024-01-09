@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,18 +21,19 @@ public class Character : MonoBehaviour
     private int healthDie;
     private int movementDie;
     private int attack;
-    private Tile tileCurrent;
+    public Tile tileCurrent;
     private Tile tileLast;
 
     public int health;
 
+    private bool invulnerability = false;
+    private bool damageBoost = false;
+    private bool speedBoost = false;
+    public bool teleport = false;
+
     private void Awake()
     {
 
-    }
-
-    private void OnDestroy()
-    {
     }
 
     void Start()
@@ -73,17 +75,28 @@ public class Character : MonoBehaviour
 
     public void TurnStart()
     {
+        if (teleport == true)
+            return;
+
         GameManager.instance.moveButton.onClick.AddListener(Move);
         GameManager.instance.battleButton.onClick.AddListener(Battle);
         GameManager.instance.conquerButton.onClick.AddListener(Conquer);
 
         GameManager.instance.moveButton.interactable = true;
 
-        if(tileCurrent?.type == TileType.Land && tileCurrent?.owner != this && tileCurrent?.owner != null)
+        /// TODO
+        /// Disable Battle/Conquer on round one and when attacker on defender are on the other's tile
+
+        if (tileCurrent?.type == TileType.Land && tileCurrent?.owner != this && tileCurrent?.owner != null)
         {
             if (health > 5) GameManager.instance.moveButton.interactable = false;
             GameManager.instance.battleButton.interactable = true;
             GameManager.instance.conquerButton.interactable = true;
+        }
+        
+        if (tileCurrent?.type == TileType.Wildcard)
+        {
+            Draw();
         }
     }
 
@@ -115,7 +128,7 @@ public class Character : MonoBehaviour
     protected IEnumerator MoveCoroutine()
     {
 
-        int movementRoll = Roll(movementDie);
+        int movementRoll = Roll(movementDie) + ((speedBoost) ? 2: 0);
 
         for (int i = 0; i < movementRoll; i++)
         {
@@ -140,6 +153,15 @@ public class Character : MonoBehaviour
             yield return new WaitForSeconds(.1f);
         }
 
+        speedBoost = false;
+
+        LandingAction();
+
+        TurnEnd();
+    }
+
+    public void LandingAction()
+    {
         if (tileCurrent.type == TileType.Land)
         {
             if (tileCurrent.owner == null)
@@ -152,8 +174,6 @@ public class Character : MonoBehaviour
                 GameManager.instance.conquerButton.interactable = true;
             }
         }
-
-        TurnEnd();
     }
 
     public void Battle()
@@ -178,7 +198,7 @@ public class Character : MonoBehaviour
 
         if (attackerHealthRoll > defenderTotal)
         {
-            Damage(tileCurrent.owner.attack);
+            tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
             Debug.Log($"{role} won!");
         }
         else
@@ -186,10 +206,13 @@ public class Character : MonoBehaviour
             Debug.Log($"{tileCurrent.owner} won!");
         }
 
-        Damage(tileCurrent.owner.attack);
-        tileCurrent.owner.Damage(attack);
+        Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
+        tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
 
         yield return new WaitForSeconds(.25f);
+
+        invulnerability = false;
+        damageBoost = false;
 
         TurnEnd();
     }
@@ -222,16 +245,17 @@ public class Character : MonoBehaviour
 
             if (attackerTotal > defenderTotal)
             {
-                Damage(tileCurrent.owner.attack);
+                tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
                 Debug.Log($"{role} won {i}/3!"); win++;
             }
             else
             {
+                Damage(tileCurrent.owner.attack);
                 Debug.Log($"{tileCurrent.owner} won {i}/3!");
             }
 
-            Damage(tileCurrent.owner.attack);
-            tileCurrent.owner.Damage(attack);
+            Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
+            tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
 
             yield return new WaitForSeconds(.25f);
         }
@@ -240,12 +264,15 @@ public class Character : MonoBehaviour
 
         if (win >= 2) tileCurrent.SetOwner(this);
 
+        invulnerability = false;
+        damageBoost = false;
+
         TurnEnd();
     }
 
     private void Draw()
     {
-        int selected = random.Next(2);
+        int selected = random.Next(16);
 
         Debug.Log("WILDCARD:");
 
@@ -256,10 +283,147 @@ public class Character : MonoBehaviour
                 Heal(2);
                 break;
             case 1:
+                Debug.Log("MOVE TO THE NEAREST ENEMY AND DUEL");
+                GoToNearestEnemy();
+                break;
+            case 2:
+                Debug.Log("GO TO START AND RECOVER TWO HEALTH POINTS");
+                GoToStart();
+                Heal(2);
+                break;
+            case 3:
+                Debug.Log("MOVE BACKWARD 2 SQUARE SPACE");
+                MoveBack(2);
+                break;
+            case 4:
+                Debug.Log("SWOOOOSH, EVERY PLAYER HEAL 1 HEALTH POINT");
+                foreach (Character character in GameManager.instance.players)
+                    character.Heal(1);
+                break;
+            case 5:
+                Debug.Log("MOVE TO SQUARE 17");
+                GoToTile(1);//
+                break;
+            case 6:
+                Debug.Log("MOVE FORWARD 2 SQUARE SPACE");
+                GoTo(tileCurrent.nextTiles[0].nextTiles[0]);
+                break;
+            case 7:
+                Debug.Log("THROW MOVE DICE AND MOVE");
+                Move();
+                break;
+            case 8:
+                Debug.Log("MOVE TO YOUR NEAREST OWNED PLACE");
+                GoToNearestTerritory();
+                break;
+            case 9:
+                Debug.Log("YOUR NEXT BATTLE WILL NOT TAKE DAMAGE");
+                invulnerability = true;
+                break;
+            case 10:
+                Debug.Log("TELEPORT TO ANYWHERE YOU DESIRE");
+                teleport = true;
+                break;
+            case 11:
                 Debug.Log("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
-                Heal(-1);
+                Damage(1);
+                break;
+            case 12:
+                Debug.Log("YOUR NEXT BATTLE DEALS DOUBLE DAMAGE");
+                damageBoost = true;
+                break;
+            case 13:
+                Debug.Log("MOVE TO SQUARE 20");
+                GoToTile(3);//
+                break;
+            case 14:
+                Debug.Log("BOOTS OF SPEED, YOUR NEXT MOVE WILL ADD 2");
+                speedBoost = true;
+                break;
+            case 15:
+                Debug.Log("FOUND A TOWN PORTAL, GO TO START AND HEAL 4 HEALTH POINT");
+                GoToStart();
+                Heal(4);
                 break;
         }
+
+        TurnEnd();
+    }
+
+    private void MoveBack(int v)
+    {
+        var tiles = FindObjectsOfType<Tile>();
+
+        foreach (var tile in tiles)
+        {
+            Debug.Log(tile.nextTiles[0].nextTiles[0]);
+            if (tile.nextTiles[0].nextTiles[0] == tileCurrent)
+            {
+                transform.position = tile.transform.position + new Vector3(0, 1, 0);
+                tileLast = tileCurrent;
+                tileCurrent = tile;
+                break;
+            }
+        }
+    }
+
+    public void GoTo(Tile tile)
+    {
+        transform.position = tile.transform.position + new Vector3(0, 1, 0);
+        tileLast = tileCurrent;
+        tileCurrent = tile;
+    }
+
+    private void GoToTile(int dest)
+    {
+        var tiles = FindObjectsOfType<Tile>().OrderBy(p => p.name).ToList();
+
+        GoTo(tiles[dest]);
+    }
+
+    private void GoToStart()
+    {
+        GoTo(tileStart.GetComponent<Tile>());
+    }
+
+    private void GoToNearestTerritory()
+    {
+        var tiles = FindObjectsOfType<Tile>();
+
+        Tile tileDestination = tileCurrent;
+
+        float distance = 1000.0f;
+
+        foreach (var tile in tiles)
+        {
+            if(tile.owner == this && Vector3.Distance(tileCurrent.transform.position, tile.transform.position) < distance)
+            {
+                tileDestination = tile;
+                distance = Vector3.Distance(tileCurrent.transform.position, tile.transform.position);
+            }
+        }
+
+        GoTo(tileDestination);
+    }
+
+    private void GoToNearestEnemy()
+    {
+        var tiles = FindObjectsOfType<Tile>();
+
+        Tile tileDestination = tileCurrent;
+
+        float distance = 1000.0f;
+
+        foreach (var tile in tiles)
+        {
+           if (tile.type == TileType.Land && tile.owner != null && tile.owner != this && Vector3.Distance(tileCurrent.transform.position, tile.transform.position) < distance)
+            {
+                tileDestination = tile;
+                distance = Vector3.Distance(tileCurrent.transform.position, tile.transform.position);
+            }
+        }
+
+        GoTo(tileDestination);
     }
 
     private int Roll(int face)

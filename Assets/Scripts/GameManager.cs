@@ -37,19 +37,36 @@ public class GameManager : MonoBehaviour
         players[turn].TurnStart();
     }
 
+    private void Update()
+    {
+        if (players[turn].teleport == true)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 100))
+                {
+                    if (hit.transform.gameObject.GetComponent<Tile>() != null)
+                    {
+                        players[turn].teleport = false;
+                        players[turn].GoTo(hit.transform.gameObject.GetComponent<Tile>());
+                        players[turn].TurnEnd();
+                    }
+                }
+            }
+        }
+    }
+
     public void Decide()
     {
-        if (battleButton.interactable || conquerButton.interactable)
-        {
-            ResetButtons();
-            RemoveDeadCharacters();
-            players[turn].TurnStart();
-            return;
-        }
-
         ResetButtons();
         RemoveDeadCharacters();
-        TurnNext();
+        if (players[turn].teleport == true || players[turn].tileCurrent.type == TileType.Wildcard || battleButton.interactable)
+            players[turn].TurnStart();
+        else
+            TurnNext();
     }
 
     public void TurnNext()
