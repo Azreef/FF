@@ -29,12 +29,11 @@ public class Character : MonoBehaviour
     private bool invulnerability = false;
     private bool damageBoost = false;
     private bool speedBoost = false;
+
     public bool teleport = false;
-
-    private void Awake()
-    {
-
-    }
+    public bool duel = false;
+    public bool drawn = false;
+    public bool move = false;
 
     void Start()
     {
@@ -78,6 +77,12 @@ public class Character : MonoBehaviour
         if (teleport == true)
             return;
 
+        if (tileCurrent?.type == TileType.Wildcard && !drawn)
+        {
+            Draw();
+            if (move != true) return;
+        }
+
         GameManager.instance.moveButton.onClick.AddListener(Move);
         GameManager.instance.battleButton.onClick.AddListener(Battle);
         GameManager.instance.conquerButton.onClick.AddListener(Conquer);
@@ -92,11 +97,6 @@ public class Character : MonoBehaviour
             if (health > 5) GameManager.instance.moveButton.interactable = false;
             GameManager.instance.battleButton.interactable = true;
             GameManager.instance.conquerButton.interactable = true;
-        }
-        
-        if (tileCurrent?.type == TileType.Wildcard)
-        {
-            Draw();
         }
     }
 
@@ -154,6 +154,8 @@ public class Character : MonoBehaviour
         }
 
         speedBoost = false;
+        drawn = false;
+        move = false;
 
         LandingAction();
 
@@ -170,8 +172,7 @@ public class Character : MonoBehaviour
             }
             else if (tileCurrent.owner != this)
             {
-                GameManager.instance.battleButton.interactable = true;
-                GameManager.instance.conquerButton.interactable = true;
+                duel = true;
             }
         }
     }
@@ -213,6 +214,7 @@ public class Character : MonoBehaviour
 
         invulnerability = false;
         damageBoost = false;
+        duel = false;
 
         TurnEnd();
     }
@@ -266,13 +268,14 @@ public class Character : MonoBehaviour
 
         invulnerability = false;
         damageBoost = false;
+        duel = false;
 
         TurnEnd();
     }
 
     private void Draw()
     {
-        int selected = random.Next(16);
+        int selected = 4;// random.Next(16);
 
         Debug.Log("WILDCARD:");
 
@@ -297,12 +300,11 @@ public class Character : MonoBehaviour
                 break;
             case 4:
                 Debug.Log("SWOOOOSH, EVERY PLAYER HEAL 1 HEALTH POINT");
-                foreach (Character character in GameManager.instance.players)
-                    character.Heal(1);
+                HealAll();
                 break;
             case 5:
                 Debug.Log("MOVE TO SQUARE 17");
-                GoToTile(1);//
+                GoToTile(17);
                 break;
             case 6:
                 Debug.Log("MOVE FORWARD 2 SQUARE SPACE");
@@ -310,8 +312,9 @@ public class Character : MonoBehaviour
                 break;
             case 7:
                 Debug.Log("THROW MOVE DICE AND MOVE");
-                Move();
-                break;
+                move = true;
+                drawn = true;
+                return;
             case 8:
                 Debug.Log("MOVE TO YOUR NEAREST OWNED PLACE");
                 GoToNearestTerritory();
@@ -323,7 +326,8 @@ public class Character : MonoBehaviour
             case 10:
                 Debug.Log("TELEPORT TO ANYWHERE YOU DESIRE");
                 teleport = true;
-                break;
+                drawn = true;
+                return;
             case 11:
                 Debug.Log("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
                 Damage(1);
@@ -334,7 +338,7 @@ public class Character : MonoBehaviour
                 break;
             case 13:
                 Debug.Log("MOVE TO SQUARE 20");
-                GoToTile(3);//
+                GoToTile(20);
                 break;
             case 14:
                 Debug.Log("BOOTS OF SPEED, YOUR NEXT MOVE WILL ADD 2");
@@ -345,9 +349,21 @@ public class Character : MonoBehaviour
                 GoToStart();
                 Heal(4);
                 break;
+            default:
+                throw new NotImplementedException();
         }
 
+        drawn = true;
         TurnEnd();
+    }
+
+    public void HealAll()
+    {
+        var ps = GameManager.instance.players;
+        foreach (Character character in ps)
+        {
+            health = Math.Min(healthMax, health + 1);
+        }
     }
 
     private void MoveBack(int v)
@@ -372,13 +388,16 @@ public class Character : MonoBehaviour
         transform.position = tile.transform.position + new Vector3(0, 1, 0);
         tileLast = tileCurrent;
         tileCurrent = tile;
+
+        LandingAction();
     }
 
-    private void GoToTile(int dest)
+    private void GoToTile(int destination)
     {
         var tiles = FindObjectsOfType<Tile>().OrderBy(p => p.name).ToList();
+        destination = Math.Min(destination, tiles.Count() - 1);
 
-        GoTo(tiles[dest]);
+        GoTo(tiles[destination]);
     }
 
     private void GoToStart()

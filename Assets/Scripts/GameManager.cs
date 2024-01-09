@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     {
         ResetButtons();
         RemoveDeadCharacters();
-        if (players[turn].teleport == true || players[turn].tileCurrent.type == TileType.Wildcard || battleButton.interactable)
+        if (players[turn].teleport == true || players[turn].move == true || players[turn].duel == true || (players[turn].tileCurrent.type == TileType.Wildcard && !players[turn].drawn))
             players[turn].TurnStart();
         else
             TurnNext();
