@@ -90,7 +90,7 @@ public class Character : MonoBehaviour
         GameManager.instance.moveButton.interactable = true;
 
         /// TODO
-        /// Disable Battle/Conquer on round one and when attacker on defender are on the other's tile
+        /// Disable Battle/Conquer when attacker on defender are on the other's tile
 
         if (tileCurrent?.type == TileType.Land && tileCurrent?.owner != this && tileCurrent?.owner != null)
         {
@@ -170,7 +170,7 @@ public class Character : MonoBehaviour
             {
                 tileCurrent.SetOwner(this);
             }
-            else if (tileCurrent.owner != this)
+            else if (tileCurrent.owner != this && GameManager.instance.round > 0)
             {
                 duel = true;
             }
