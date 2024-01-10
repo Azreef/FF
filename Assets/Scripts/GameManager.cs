@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using static UnityEngine.ParticleSystem;
 
 public class GameManager : MonoBehaviour
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textWin;
     [SerializeField] private GameObject panelWin;
 
+    public VideoPlayer videoPlayer;
     public static GameManager instance;
     private System.Random random = new System.Random();
 

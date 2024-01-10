@@ -162,7 +162,7 @@ public class Character : MonoBehaviour
 
             if (tileCurrent.type == TileType.Start) Heal(2);
 
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(.5f);
         }
 
         speedBoost = false;
@@ -204,6 +204,11 @@ public class Character : MonoBehaviour
             TurnEnd();
         }
 
+        GameManager.instance.videoPlayer.Play();
+        yield return new WaitForSeconds(2f);
+        GameManager.instance.videoPlayer.Stop();
+        yield return new WaitForSeconds(.5f);
+
         int attackerHealthRoll = Roll(healthDie);
 
         int defenderHealthRoll = Roll(tileCurrent.owner.healthDie);
@@ -211,8 +216,11 @@ public class Character : MonoBehaviour
         int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
         GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner.role}");
+        yield return new WaitForSeconds(1.0f);
         GameManager.instance.PrintText($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
+        yield return new WaitForSeconds(1.0f);
         GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
+        yield return new WaitForSeconds(1.0f);
 
         if (attackerHealthRoll > defenderTotal)
         {
@@ -223,11 +231,12 @@ public class Character : MonoBehaviour
         {
             GameManager.instance.PrintText($"{tileCurrent.owner.role} won!");
         }
+        yield return new WaitForSeconds(1.0f);
 
         Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
         tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
 
-        yield return new WaitForSeconds(.25f);
+        yield return new WaitForSeconds(1.0f);
 
         invulnerability = false;
         damageBoost = false;
@@ -253,6 +262,11 @@ public class Character : MonoBehaviour
             TurnEnd();
         }
 
+        GameManager.instance.videoPlayer.Play();
+        yield return new WaitForSeconds(2f);
+        GameManager.instance.videoPlayer.Stop();
+        yield return new WaitForSeconds(.5f);
+
         for (int i = 1; i < 4; i++)
         {
             int attackerHealthRoll = Roll(healthDie);
@@ -264,8 +278,11 @@ public class Character : MonoBehaviour
             int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
             GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner.role}");
+            yield return new WaitForSeconds(1.0f);
             GameManager.instance.PrintText($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
+            yield return new WaitForSeconds(1.0f);
             GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
+            yield return new WaitForSeconds(1.0f);
 
             if (attackerTotal > defenderTotal)
             {
@@ -281,7 +298,7 @@ public class Character : MonoBehaviour
             Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
             tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
 
-            yield return new WaitForSeconds(.25f);
+            yield return new WaitForSeconds(1.0f);
         }
 
         GameManager.instance.PrintText($"{role} won {win} times!");
@@ -394,7 +411,6 @@ public class Character : MonoBehaviour
 
         foreach (var tile in tiles)
         {
-            GameManager.instance.PrintText("{tile.nextTiles[0].nextTiles[0]}");
             if (tile.nextTiles[0].nextTiles[0] == tileCurrent)
             {
                 transform.position = tile.transform.position + new Vector3(0, 1, 0);
