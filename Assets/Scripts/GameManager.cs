@@ -140,6 +140,6 @@ public class GameManager : MonoBehaviour
 
     public void NextScene()
     {
-        SceneManager.LoadScene(sceneNext.name);
+        SceneManager.LoadScene("Main Menu");
     }
 }

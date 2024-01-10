@@ -113,8 +113,8 @@ public class Reward : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Y))
         {
             Debug.Log("Reset Purchase");
-            PlayerPrefs.SetInt("brutePurchased", 0);
-            PlayerPrefs.SetInt("priestPurchased", 0);
+            PlayerPrefs.SetInt("level2Purchased", 0);
+            PlayerPrefs.SetInt("level3Purchased", 0);
         }
 
     }
@@ -170,7 +170,7 @@ public class Reward : MonoBehaviour
             claimText.text = "Time Remaining: " + GetTimeLeftClaim();
         }
 
-        if (PlayerPrefs.GetInt("brutePurchased") == 1)
+        if (PlayerPrefs.GetInt("level2Purchased") == 1)
         {
             bruteButton.enabled = false;
             bruteText.text = "Purchased";
@@ -181,7 +181,7 @@ public class Reward : MonoBehaviour
             bruteText.text = "Buy 100 Coins";
         }
 
-        if (PlayerPrefs.GetInt("priestPurchased") == 1)
+        if (PlayerPrefs.GetInt("level3Purchased") == 1)
         {
             priestButton.enabled = false;
             priestText.text = "Purchased";
@@ -218,7 +218,7 @@ public class Reward : MonoBehaviour
         click.Play();
         if (PlayerPrefs.GetInt("playerCoin") >= 100)
         {
-            PlayerPrefs.SetInt("brutePurchased", 1);
+            PlayerPrefs.SetInt("level2Purchased", 1);
             PlayerPrefs.SetInt("playerCoin", PlayerPrefs.GetInt("playerCoin") - 100);
         }
 
@@ -229,7 +229,7 @@ public class Reward : MonoBehaviour
         click.Play();
         if (PlayerPrefs.GetInt("playerCoin") >= 200)
         {
-            PlayerPrefs.SetInt("priestPurchased", 1);
+            PlayerPrefs.SetInt("level3Purchased", 1);
             PlayerPrefs.SetInt("playerCoin", PlayerPrefs.GetInt("playerCoin") - 200);
         }
 
