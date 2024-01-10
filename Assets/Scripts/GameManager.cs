@@ -47,8 +47,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        VictoryCheck();
-
         if (players[turn].teleport == true)
         {
             if (Input.GetMouseButtonDown(0))
