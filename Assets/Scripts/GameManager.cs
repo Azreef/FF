@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private UnityEngine.Object sceneNext;
     [SerializeField] private TextMeshProUGUI text;
+    [SerializeField] private TextMeshProUGUI textWin;
+    [SerializeField] private GameObject panelWin;
 
     public static GameManager instance;
     private System.Random random = new System.Random();
@@ -43,6 +45,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        VictoryCheck();
+
         if (players[turn].teleport == true)
         {
             if (Input.GetMouseButtonDown(0))
@@ -121,15 +125,20 @@ public class GameManager : MonoBehaviour
 
     public void VictoryCheck()
     {
-        if (players.Count == 1)
+        if (players.Count <= 1)
         {
-            PrintText($"{players[0].gameObject.name} Won!");
-            SceneManager.LoadScene(sceneNext.name);
+            textWin.text = $"{players[0].gameObject.name} Wins!";
+            panelWin.SetActive(true);
         }
     }
 
     public void PrintText(string t)
     {
         text.text = t;
+    }
+
+    public void NextScene()
+    {
+        SceneManager.LoadScene(sceneNext.name);
     }
 }

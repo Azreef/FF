@@ -209,7 +209,7 @@ public class Character : MonoBehaviour
         int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
         int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
-        GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner}");
+        GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner.role}");
         GameManager.instance.PrintText($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
         GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
@@ -220,7 +220,7 @@ public class Character : MonoBehaviour
         }
         else
         {
-            GameManager.instance.PrintText($"{tileCurrent.owner} won!");
+            GameManager.instance.PrintText($"{tileCurrent.owner.role} won!");
         }
 
         Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
@@ -262,7 +262,7 @@ public class Character : MonoBehaviour
             int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
             int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
-            GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner}");
+            GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner.role}");
             GameManager.instance.PrintText($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
             GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
@@ -274,7 +274,7 @@ public class Character : MonoBehaviour
             else
             {
                 Damage(tileCurrent.owner.attack);
-                GameManager.instance.PrintText($"{tileCurrent.owner} won {i}/3!");
+                GameManager.instance.PrintText($"{tileCurrent.owner.role} won {i}/3!");
             }
 
             Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
