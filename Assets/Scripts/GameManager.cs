@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -12,6 +13,7 @@ using static UnityEngine.ParticleSystem;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private UnityEngine.Object sceneNext;
+    [SerializeField] private TextMeshProUGUI text;
 
     public static GameManager instance;
     private System.Random random = new System.Random();
@@ -121,8 +123,13 @@ public class GameManager : MonoBehaviour
     {
         if (players.Count == 1)
         {
-            Debug.Log($"{players[0].gameObject.name} Won!");
+            PrintText($"{players[0].gameObject.name} Won!");
             SceneManager.LoadScene(sceneNext.name);
         }
+    }
+
+    public void PrintText(string t)
+    {
+        text.text = t;
     }
 }

@@ -209,18 +209,18 @@ public class Character : MonoBehaviour
         int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
         int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
-        Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
-        Debug.Log($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
-        Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
+        GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner}");
+        GameManager.instance.PrintText($"Attacker rolled {attackerHealthRoll} | Health Roll: {attackerHealthRoll}");
+        GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
         if (attackerHealthRoll > defenderTotal)
         {
             tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
-            Debug.Log($"{role} won!");
+            GameManager.instance.PrintText($"{role} won!");
         }
         else
         {
-            Debug.Log($"{tileCurrent.owner} won!");
+            GameManager.instance.PrintText($"{tileCurrent.owner} won!");
         }
 
         Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
@@ -262,19 +262,19 @@ public class Character : MonoBehaviour
             int defenderMovementRoll = Roll(tileCurrent.owner.movementDie);
             int defenderTotal = defenderHealthRoll + defenderMovementRoll;
 
-            Debug.Log($"Attacker: {role} | Defender: {tileCurrent.owner}");
-            Debug.Log($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
-            Debug.Log($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
+            GameManager.instance.PrintText($"Attacker: {role} | Defender: {tileCurrent.owner}");
+            GameManager.instance.PrintText($"Attacker rolled {attackerTotal} | Health Roll: {attackerHealthRoll} | Movement Roll: {attackerMovementRoll}");
+            GameManager.instance.PrintText($"Defender rolled {defenderTotal} | Health Roll: {defenderHealthRoll} | Movement Roll: {defenderMovementRoll}");
 
             if (attackerTotal > defenderTotal)
             {
                 tileCurrent.owner.Damage(tileCurrent.owner.invulnerability ? 0 : damageBoost ? attack * 2 : attack);
-                Debug.Log($"{role} won {i}/3!"); win++;
+                GameManager.instance.PrintText($"{role} won {i}/3!"); win++;
             }
             else
             {
                 Damage(tileCurrent.owner.attack);
-                Debug.Log($"{tileCurrent.owner} won {i}/3!");
+                GameManager.instance.PrintText($"{tileCurrent.owner} won {i}/3!");
             }
 
             Damage(invulnerability ? 0 : tileCurrent.owner.damageBoost ? tileCurrent.owner.attack * 2 : tileCurrent.owner.attack);
@@ -283,7 +283,7 @@ public class Character : MonoBehaviour
             yield return new WaitForSeconds(.25f);
         }
 
-        Debug.Log($"{role} won {win} times!");
+        GameManager.instance.PrintText($"{role} won {win} times!");
 
         if (win >= 2) tileCurrent.SetOwner(this);
 
@@ -298,75 +298,75 @@ public class Character : MonoBehaviour
     {
         int selected = random.Next(16);
 
-        Debug.Log("WILDCARD:");
+        GameManager.instance.PrintText("WILDCARD:");
 
         switch (selected)
         {
             case 0:
-                Debug.Log("YOU FOUND A HEALING POTION, HEAL 2 HEALTH POINT");
+                GameManager.instance.PrintText("YOU FOUND A HEALING POTION, HEAL 2 HEALTH POINT");
                 Heal(2);
                 break;
             case 1:
-                Debug.Log("MOVE TO THE NEAREST ENEMY AND DUEL");
+                GameManager.instance.PrintText("MOVE TO THE NEAREST ENEMY AND DUEL");
                 GoToNearestEnemy();
                 break;
             case 2:
-                Debug.Log("GO TO START AND RECOVER TWO HEALTH POINTS");
+                GameManager.instance.PrintText("GO TO START AND RECOVER TWO HEALTH POINTS");
                 GoToStart();
                 Heal(2);
                 break;
             case 3:
-                Debug.Log("MOVE BACKWARD 2 SQUARE SPACE");
+                GameManager.instance.PrintText("MOVE BACKWARD 2 SQUARE SPACE");
                 MoveBack(2);
                 break;
             case 4:
-                Debug.Log("SWOOOOSH, EVERY PLAYER HEAL 1 HEALTH POINT");
+                GameManager.instance.PrintText("SWOOOOSH, EVERY PLAYER HEAL 1 HEALTH POINT");
                 HealAll();
                 break;
             case 5:
-                Debug.Log("MOVE TO SQUARE 17");
+                GameManager.instance.PrintText("MOVE TO SQUARE 17");
                 GoToTile(17);
                 break;
             case 6:
-                Debug.Log("MOVE FORWARD 2 SQUARE SPACE");
+                GameManager.instance.PrintText("MOVE FORWARD 2 SQUARE SPACE");
                 GoTo(tileCurrent.nextTiles[0].nextTiles[0]);
                 break;
             case 7:
-                Debug.Log("THROW MOVE DICE AND MOVE");
+                GameManager.instance.PrintText("THROW MOVE DICE AND MOVE");
                 move = true;
                 drawn = true;
                 return;
             case 8:
-                Debug.Log("MOVE TO YOUR NEAREST OWNED PLACE");
+                GameManager.instance.PrintText("MOVE TO YOUR NEAREST OWNED PLACE");
                 GoToNearestTerritory();
                 break;
             case 9:
-                Debug.Log("YOUR NEXT BATTLE WILL NOT TAKE DAMAGE");
+                GameManager.instance.PrintText("YOUR NEXT BATTLE WILL NOT TAKE DAMAGE");
                 invulnerability = true;
                 break;
             case 10:
-                Debug.Log("TELEPORT TO ANYWHERE YOU DESIRE");
+                GameManager.instance.PrintText("TELEPORT TO ANYWHERE YOU DESIRE");
                 teleport = true;
                 drawn = true;
                 return;
             case 11:
-                Debug.Log("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
+                GameManager.instance.PrintText("YOU STEPPED ON A SEA URCHIN, GET HIT 1 DAMAGE");
                 Damage(1);
                 break;
             case 12:
-                Debug.Log("YOUR NEXT BATTLE DEALS DOUBLE DAMAGE");
+                GameManager.instance.PrintText("YOUR NEXT BATTLE DEALS DOUBLE DAMAGE");
                 damageBoost = true;
                 break;
             case 13:
-                Debug.Log("MOVE TO SQUARE 20");
+                GameManager.instance.PrintText("MOVE TO SQUARE 20");
                 GoToTile(20);
                 break;
             case 14:
-                Debug.Log("BOOTS OF SPEED, YOUR NEXT MOVE WILL ADD 2");
+                GameManager.instance.PrintText("BOOTS OF SPEED, YOUR NEXT MOVE WILL ADD 2");
                 speedBoost = true;
                 break;
             case 15:
-                Debug.Log("FOUND A TOWN PORTAL, GO TO START AND HEAL 4 HEALTH POINT");
+                GameManager.instance.PrintText("FOUND A TOWN PORTAL, GO TO START AND HEAL 4 HEALTH POINT");
                 GoToStart();
                 Heal(4);
                 break;
@@ -393,7 +393,7 @@ public class Character : MonoBehaviour
 
         foreach (var tile in tiles)
         {
-            Debug.Log(tile.nextTiles[0].nextTiles[0]);
+            GameManager.instance.PrintText("{tile.nextTiles[0].nextTiles[0]}");
             if (tile.nextTiles[0].nextTiles[0] == tileCurrent)
             {
                 transform.position = tile.transform.position + new Vector3(0, 1, 0);
@@ -469,7 +469,7 @@ public class Character : MonoBehaviour
     private int Roll(int face)
     {
         int r = UnityEngine.Random.Range(1, face + 1);
-        Debug.Log(string.Format("Rolling 1d{0}: {1}", face, r));
+        //GameManager.instance.PrintText(string.Format("Rolling 1d{0}: {1}", face, r));
         return r;
     }
 }
