@@ -15,8 +15,9 @@ public class Character : MonoBehaviour
     [SerializeField] private GameObject warrior;
     [SerializeField] private GameObject wizard;
     [SerializeField] private GameObject tileStart;
-    [SerializeField] private Image image;
     [SerializeField] private Image healthBar;
+
+    public Image image;
 
     private System.Random random = new System.Random();
     private int healthMax;

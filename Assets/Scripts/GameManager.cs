@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
                 {
                     if (hit.transform.gameObject.GetComponent<Tile>() != null)
                     {
+                        players[turn].drawn = false;
                         players[turn].teleport = false;
                         players[turn].GoTo(hit.transform.gameObject.GetComponent<Tile>());
                         players[turn].TurnEnd();
@@ -114,8 +115,8 @@ public class GameManager : MonoBehaviour
                     if (tile.owner == players[i]) tile.ResetOwner();
                 }
 
+                players[i].image.color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
                 Destroy(players[i].gameObject);
-
                 players.RemoveAt(i);
             }
         }
